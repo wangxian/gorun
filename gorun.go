@@ -49,9 +49,8 @@ func Start() {
 
 		curpath, _ := os.Getwd()
 		// log.Println(curpath)
-		appname = "./"+ filepath.Base(curpath)
 
-		cmd = exec.Command(appname)
+		cmd = exec.Command("./"+ filepath.Base(curpath))
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 
@@ -72,10 +71,10 @@ func Rebuild() {
 	err := bcmd.Run()
 
 	if err != nil {
-		log.Println("============== Rebuild failed ==============")
+		log.Println("============== Rebuild project failed ==============")
 		return
 	}
-	log.Println("-------------- Rebuild success --------------")
+	log.Println("Rebuild project success ...")
 }
 
 func Stop() {
@@ -129,14 +128,14 @@ func Watch() {
 
 			changed := true
 			if t, ok := eventTime[e.String()]; ok {
-				if t.Add(time.Millisecond * 800).After(time.Now()) {
+				if t.Add(time.Millisecond * 1200).After(time.Now()) {
 					changed = false
 				}
 			}
 			eventTime[e.String()] = time.Now()
 
 			if changed && strings.Contains(e.Name, ".go") {
-				log.Println(e.String(), time.Now().String())
+				log.Println(e.String())
 				Restart()
 			}
 
@@ -149,7 +148,7 @@ func Watch() {
 func main() {
 	flag.Parse()
 	appname = flag.Arg(0)
-	// Start()
+	Start()
 
 	Watch()
 }
