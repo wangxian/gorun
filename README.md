@@ -7,7 +7,7 @@ gorun
 
 ```sh
 
-// 1. Current dir is a project
+// 1. Run Current dir as a project
 gorun
 
 // 2. Run only a single file
