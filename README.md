@@ -20,7 +20,8 @@ gorun my.go
 Binaries
 
 - [Mac OSX 10.8+](#)
-- [Windows bit64](#)
+- [Windows 32bit](#)
+- [Windows 64bit](#)
 - [Linux](#)
 
 Move orange file to your `$PATH`
