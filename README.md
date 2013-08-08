@@ -29,7 +29,7 @@ Move orange file to your `$PATH`
 If you have already installed the golang
 
 ```sh
-go get -u http://github.com/wangxian/gorun
+go get -u github.com/wangxian/gorun
 ```
 
 THEN add your `$GOPATH/bin` to your `$PATH`

@@ -12,28 +12,26 @@
 package main
 
 import (
-	"os"
-	"log"
 	"flag"
-	"strings"
-	"os/exec"
-	"time"
-	"sync"
-	"path/filepath"
 	"github.com/howeyc/fsnotify"
+	"log"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strings"
+	"sync"
+	"time"
 	// "code.google.com/p/go.exp/fsnotify"
 )
 
-
 var (
-	cmd       *exec.Cmd
-	state     sync.Mutex
-	appname   string
+	cmd     *exec.Cmd
+	state   sync.Mutex
+	appname string
 
 	// fixed: File change soon
 	eventTime = make(map[string]time.Time)
 )
-
 
 func Start() {
 	if appname != "" {
@@ -50,13 +48,12 @@ func Start() {
 		curpath, _ := os.Getwd()
 		// log.Println(curpath)
 
-		cmd = exec.Command("./"+ filepath.Base(curpath))
+		cmd = exec.Command("./" + filepath.Base(curpath))
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 
 		go cmd.Run()
 	}
-
 }
 
 func Rebuild() {
@@ -84,16 +81,19 @@ func Stop() {
 		}
 	}()
 	if cmd != nil {
-		log.Println("Kill running process")
+		log.Println("Kill running process:", cmd.Process.Pid)
 		cmd.Process.Kill()
+		// // cmd.Process.Release()
+
+		// st, _ := cmd.Process.Wait()
+		// log.Println("Kill process:", st.Exited())
 	}
 }
 
 func Restart() {
 	Stop()
-	go Start()
+	Start()
 }
-
 
 func Watch() {
 	path, _ := os.Getwd()
@@ -128,7 +128,7 @@ func Watch() {
 
 			changed := true
 			if t, ok := eventTime[e.String()]; ok {
-				if t.Add(time.Millisecond * 1200).After(time.Now()) {
+				if t.Add(time.Millisecond * 2000).After(time.Now()) {
 					changed = false
 				}
 			}
