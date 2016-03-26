@@ -13,7 +13,7 @@ package main
 
 import (
 	"flag"
-	"github.com/howeyc/fsnotify"
+	"github.com/fsnotify/fsnotify"
 	"log"
 	"os"
 	"os/exec"
@@ -102,6 +102,7 @@ func Watch() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer watcher.Close()
 
 	// walk dirs
 	walkFn := func(path string, info os.FileInfo, err error) error {
@@ -110,7 +111,7 @@ func Watch() {
 		if info.IsDir() && !strings.Contains(path, ".") {
 			log.Println("Watch DIR:", path)
 
-			err = watcher.Watch(path)
+			err = watcher.Add(path)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -122,25 +123,28 @@ func Watch() {
 		log.Println(err)
 	}
 
+	changed := false
 	for {
 		select {
-		case e := <-watcher.Event:
+		case event := <-watcher.Events:
 
-			changed := true
-			if t, ok := eventTime[e.String()]; ok {
-				if t.Add(time.Millisecond * 2000).After(time.Now()) {
+			changed = true
+			if t, ok := eventTime[event.Name]; ok {
+				if t.Add(time.Millisecond * 3000).After(time.Now()) {
 					changed = false
 				}
 			}
-			eventTime[e.String()] = time.Now()
+			eventTime[event.Name] = time.Now()
 
-			if changed && strings.Contains(e.Name, ".go") {
-				log.Println(e.String())
+			log.Println("event", event, "changed=", changed)
+
+			if event.Op == fsnotify.Write && strings.Contains(event.Name, ".go") {
+				println("---------------------------------------------------")
 				Restart()
 			}
 
-		case err := <-watcher.Error:
-			log.Fatal("Watcher error:", err)
+		case err := <-watcher.Errors:
+			log.Println("error:", err)
 		}
 	}
 }
